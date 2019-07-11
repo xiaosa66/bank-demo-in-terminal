@@ -60,10 +60,10 @@ public:
     void save();   //存款
     void withdraw();   //取款
     void showAccount(); //查询余额
-   /* void transferAccounts();  //转账
+    void transferAccounts();  //转账
     void reportLoss();  //挂失
     void cancelLoss();  //解除挂失
-    void updatePassword();   //更改密码 需要验证身份*/
+    void updatePassword();   //更改密码 需要验证身份
     int getUser();//输入账号查询用户，返回用户在对象数组中的下标
     void savework(int usernum,string infor);//记录用户的业务
 

@@ -18,13 +18,13 @@ int BASE::chooseInMenu()
         cout<<" ____________________________ "<<endl;
 		cout<<"|                            |"<<endl;
 		cout<<"|                            |"<<endl;
-        cout<<"| 1 开户    2 销户    3 存款   |"<<endl;
-        cout<<"| 4 取款    5 查询    0 退出   |"<<endl;
-        cout<<"|                            |"<<endl;
+        cout<<"| 1 开户    2 销户    3 存款 |"<<endl;
+        cout<<"| 4 取款    5 查询    6 转账 |"<<endl;
+        cout<<"| 7 挂失    8 解挂    0 退出 |"<<endl;
         cout<<"|____________________________|"<<endl;
         cout<<"请输入操作指令:";
         cin>>i;
-        if(i>=0 && i<=5)
+        if(i>=0 && i<=9)
             break;
         else
             cout<<"请重新选择功能:"<<endl;;

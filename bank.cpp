@@ -80,7 +80,7 @@ void Bank::work()
         case 5:
             showAccount(); //查询余额
             break;
-       /* case 6:
+        case 6:
             transferAccounts();  //转账
             break;
         case 7:
@@ -91,7 +91,7 @@ void Bank::work()
             break;
         case 9:
             updatePassword();   //更改密码
-            break;*/
+            break;
         case 0:
             cout<<"期待您下次使用! "<<endl;
         }
@@ -275,7 +275,7 @@ void Bank::showAccount()
 }
 
 
-/*void Bank::transferAccounts()
+void Bank::transferAccounts()
 //功能：转账
 {
     int whoout, whoin;
@@ -405,7 +405,7 @@ void Bank::updatePassword()
     }
     return;
 }
-*/
+
 
 int Bank::getUser()
 //功能：输入账号查询用户
