@@ -27,7 +27,7 @@
 - whatever you modified will be saved automaticlly
  
 ## todo 
-auto insert date when creating a account
+~~auto insert date when creating a account~~
 
 ## How To Start 
 
