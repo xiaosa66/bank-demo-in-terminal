@@ -35,7 +35,7 @@ void User::showBalance(string prompt)
 {
     cout<<prompt<<" "<<balance<<"元"<<endl;
 }
-bool User::passwordIsRight()
+bool User::validatePass()
 //功能：验证密码是否正确
 //调用inputPassword()函数
 {
@@ -52,7 +52,7 @@ bool User::passwordIsRight()
 }
 
 
-bool User::isNormalUser()
+bool User::checkUserStatus()
 //功能：输出用户状态
 //返回值：如果status=0，状态正常，返回true，否则，返回false
 //状态：0-正常  1-挂失  2-销户

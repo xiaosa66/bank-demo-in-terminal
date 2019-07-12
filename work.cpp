@@ -50,12 +50,12 @@ int BASE::inputPassword()
             else
             {
                 iPass=0;
-                break;  //退出for循环后，再次接受
+                break; 
             }
         }
-        fflush(stdin); //清除键盘缓存区中已经有的输入
+        fflush(stdin); 
         cout<<endl;;
-        if(iPass==0)  //此条件成立可能由两种情况引起：输入了非数字字符被直接重置为0，或6位全0后正常退出for循环
+        if(iPass==0)  
         {
             cout<<"密码要求全为数字，且不能全0!"<<endl;;
             cout<<"请重新输入密码:";

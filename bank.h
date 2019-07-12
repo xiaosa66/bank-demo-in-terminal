@@ -33,8 +33,8 @@ public:
     void setUser(int acc, char nam[30], int pw, double bal,char ide[50],int sta,int y,int m,int d);
     void showName();
     void showBalance(string prompt); //显示余额，前面加上提示词prompt
-    bool passwordIsRight();   //校验密码，输入的密码正确则返回true
-    bool isNormalUser(); //存款、取款、转帐等功能，需要账户处于正常状态
+    bool validatePass();   //校验密码，输入的密码正确则返回true
+    bool checkUserStatus(); //存款、取款、转帐等功能，需要账户处于正常状态
     friend class Bank;   //将Bank声明为友元类，方便其访问数据成员
     char id[50];
 
@@ -60,12 +60,13 @@ public:
     void save();   //存款
     void withdraw();   //取款
     void showAccount(); //查询余额
-    void transferAccounts();  //转账
+    void transferMoney();  //转账
+    void saveHooker();  // 保存钩子函数
     void reportLoss();  //挂失
     void cancelLoss();  //解除挂失
     void updatePassword();   //更改密码 需要验证身份
     int getUser();//输入账号查询用户，返回用户在对象数组中的下标
-    void savework(int usernum,string infor);//记录用户的业务
+    void saveLog(int usernum,string infor);//记录用户的业务
 
 private:
     int N;  //实际的用户数目

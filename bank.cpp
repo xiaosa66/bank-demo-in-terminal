@@ -14,7 +14,7 @@ using namespace std;
 Bank::Bank()
 //功能：用构造函数读取文件中保存的业务数据
 {
-    ifstream infile("account.txt",ios::in|ios::binary);
+    ifstream infile("accounts.myUser",ios::in|ios::binary);
     if(!infile)   //检测文件是否成功打开
     {
         cerr<<"open error!"<<endl;
@@ -39,7 +39,12 @@ Bank::Bank()
 Bank::~Bank()
 //功能：使用析构函数实现在退出系统时将数据保存到文件中
 {
-    ofstream outfile("account.txt",ios::binary);
+    saveHooker();
+    free(users);      //对应realloc()函数
+    delete[] users;   //释放动态数组占用的空间
+}
+void Bank::saveHooker(){
+    ofstream outfile("accounts.myUser",ios::binary);
     if(!outfile)    //测试文件打开操作是否成功，不成功则提示后退出。
     {
         cerr<<"open error!"<<endl;
@@ -51,10 +56,7 @@ Bank::~Bank()
         outfile.write((char *)&users[i],sizeof(users[i]));
     }
     outfile.close();
-    free(users);      //对应realloc()函数
-    delete[] users;   //释放动态数组占用的空间
 }
-
 
 void Bank::work()
 //功能：办理业务
@@ -81,7 +83,7 @@ void Bank::work()
             showAccount(); //查询余额
             break;
         case 6:
-            transferAccounts();  //转账
+            transferMoney();  //转账
             break;
         case 7:
             reportLoss();  //挂失
@@ -102,9 +104,7 @@ void Bank::work()
 
 void Bank::openAccount()
 //功能：开户
-//说明：在进入系统时读入数据过程中，已经记录用户数为N，在数组中对应下标为0~N-1，
-//		开户时要增加一个用户，只要为下标为N的数组元素置值，并在成功之后令N++即可。
-//		账号由系统自动生成(101+序号)，在顺序增加的时候，就保证了其有序性。
+
 {
     if(N==upNum)
     {
@@ -119,7 +119,7 @@ void Bank::openAccount()
     int sta;		//状态
     int y,m,d;		//开户日期
     cout<<"正在开户"<<endl;
-    acc=101+N;
+    acc=0+N;
     cout<<"账号:"<<acc<<endl;
     cout<<"户主姓名:";
     cin>>nam;
@@ -148,7 +148,7 @@ void Bank::openAccount()
     {
         cout<<"两次密码不一致,开户失败!"<<endl; //没有N++，则读入的值无效
     }
-    savework(acc,"开户成功!");
+    saveLog(acc,"开户成功!");
 }
 
 
@@ -162,7 +162,7 @@ void Bank::cancelAccount()
     if(who>=0)   //说明id账户存在
     {
         users[who].showName();
-        if(users[who].passwordIsRight())
+        if(users[who].validatePass())
         {
             //cout<<users[who].id;
             strcpy(b,users[who].id);
@@ -177,7 +177,7 @@ void Bank::cancelAccount()
                     users[who].showBalance("销户成功!本次取款金额为");
                     users[who].balance=0;  //取款后余额变0
                     users[who].status=2;  //状态变为注销
-                    savework(users[who].account,"销户成功！");
+                    saveLog(users[who].account,"销户成功！");
                 }
                 else
                 {
@@ -209,7 +209,7 @@ void Bank::save()
             cin>>money;
             users[who].balance+=money;
             users[who].showBalance("存款后，您有");
-            savework(users[who].account,"存款成功!");
+            saveLog(users[who].account,"存款成功!");
         }
         else if(users[who].status==1)
         {
@@ -232,10 +232,10 @@ void Bank::withdraw()
     who = getUser();  //根据账号查询用户，返回用户的下标
     if(who>=0)   //说明id账户存在
     {
-        if(users[who].isNormalUser())
+        if(users[who].checkUserStatus())
         {
             users[who].showName();
-            if(users[who].passwordIsRight())
+            if(users[who].validatePass())
             {
                 cout<<"输入取款额:";
                 cin>>money;
@@ -247,7 +247,7 @@ void Bank::withdraw()
                 {
                     users[who].balance-=money;
                     users[who].showBalance("取款后，还有");
-                    savework(users[who].account,"取款成功!");
+                    saveLog(users[who].account,"取款成功!");
                 }
             }
         }
@@ -265,7 +265,7 @@ void Bank::showAccount()
     if(who>=0)   //说明id账户存在
     {
         users[who].showName();
-        if(users[who].passwordIsRight())
+        if(users[who].validatePass())
         {
             users[who].showBalance("余额");
             cout<<"状态:"<<sta[users[who].status]<<endl;
@@ -275,7 +275,7 @@ void Bank::showAccount()
 }
 
 
-void Bank::transferAccounts()
+void Bank::transferMoney()
 //功能：转账
 {
     int whoout, whoin;
@@ -284,10 +284,10 @@ void Bank::transferAccounts()
     whoout = getUser();  //根据账号查询用户，返回用户的下标
     if(whoout>=0)   //说明id账户存在
     {
-        if(users[whoout].isNormalUser())
+        if(users[whoout].checkUserStatus())
         {
             users[whoout].showName();
-            if(users[whoout].passwordIsRight())
+            if(users[whoout].validatePass())
             {
                 cout<<"输入转账金额:";
                 cin>>money;
@@ -301,12 +301,12 @@ void Bank::transferAccounts()
                     whoin = getUser();  //根据账号查询用户，返回用户的下标
                     if(whoin>=0)   //说明id账户存在
                     {
-                        if(users[whoin].isNormalUser())
+                        if(users[whoin].checkUserStatus())
                         {
                             users[whoout].balance-=money;
                             users[whoin].balance+=money;
                             users[whoout].showBalance("转账后，您还有");
-                            savework(users[whoout].account,"转账成功!");
+                            saveLog(users[whoout].account,"转账成功!");
                         }
                     }
                 }
@@ -325,13 +325,13 @@ void Bank::reportLoss()
     if(who>=0)   //说明id账户存在
     {
         users[who].showName();
-        if(users[who].passwordIsRight())
+        if(users[who].validatePass())
         {
             if(users[who].status==0)
             {
                 users[who].status=1;
                 cout<<"挂失成功"<<endl;
-                savework(users[who].account,"挂失成功!");
+                saveLog(users[who].account,"挂失成功!");
             }
             else if(users[who].status==1)
             {
@@ -355,7 +355,7 @@ void Bank::cancelLoss()
     if(who>=0)   //说明id账户存在
     {
         users[who].showName();
-        if(users[who].passwordIsRight())
+        if(users[who].validatePass())
         {
             if(users[who].status==0)
             {
@@ -365,7 +365,7 @@ void Bank::cancelLoss()
             {
                 users[who].status=0;
                 cout<<"解除挂失成功"<<endl;
-                savework(users[who].account,"解除挂失成功!");
+                saveLog(users[who].account,"解除挂失成功!");
             }
             else
             {
@@ -386,7 +386,7 @@ void Bank::updatePassword()
     if(who>=0)   //说明id账户存在 验证身份ID是否正确
     {
         users[who].showName();
-        if(users[who].passwordIsRight())
+        if(users[who].validatePass())
         {
             cout<<"新密码:";
             iPass1=inputPassword();  //输入密码
@@ -435,14 +435,14 @@ int Bank::getUser()
 }
 
 
-void Bank::savework(int usernum,string infor)
+void Bank::saveLog(int usernum,string infor)
 //功能：记录用户的每项业务
 {
     time_t t;// 获取当前的系统时间，返回的结果是一个time_t类型,一个整数，其值表示从时间1970年1月1日00:00:00到当前时刻的秒数
     tm *lt;//获取日期和时间
     t = time(NULL);
     lt = localtime(&t);//获取秒数并转换为本地时间
-    ofstream workfile("accounts.txt",ios::app);
+    ofstream workfile("accounts.log",ios::app);
     if(!workfile)
     {
         cerr<<"open error!"<<endl;
@@ -451,4 +451,5 @@ void Bank::savework(int usernum,string infor)
     workfile<<lt->tm_year+1900<<"/"<<lt->tm_mon+1<<"/"<<lt->tm_mday<<" "<<lt->tm_hour<<":"<<lt->tm_min<<":"<<lt->tm_sec<<'\t';//年份，其值从1900开始，月份从一月开始，0代表一月
     workfile<<"用户"<<usernum<<"进行"<<infor<<endl;
     workfile.close();
+    saveHooker();
 }
