@@ -15,11 +15,8 @@ Bank::Bank()
 //功能：用构造函数读取文件中保存的业务数据
 {
     ifstream infile("accounts.myUser",ios::in|ios::binary);
-    if(!infile)   //检测文件是否成功打开
+    if(infile)   //检测文件是否成功打开
     {
-        cerr<<"open error!"<<endl;
-        exit(1);
-    }
     infile.seekg (0, ios::end);   //将文件指针标记在文件末尾
     int length = infile.tellg();  //计算出文件的长度
     N=length/sizeof(User);        //计算出对象的个数，然后用静态数据成员保存用户个数
@@ -33,6 +30,13 @@ Bank::Bank()
     }
     //用静态数据成员保存用户个数
     infile.close();
+       cout<<"dataBase Loaded";
+    }
+    else {
+        ofstream outfile("accounts.myUser",ios::binary);
+        cout<<"dataBase Inited";
+        outfile.close();
+    }
 }
 
 
@@ -68,10 +72,10 @@ void Bank::work()
         switch(iChoice)
         {
         case 1:
-            openAccount(); //开户
+            createAccount(); //开户
             break;
         case 2:
-            cancelAccount();  //注销账户
+            removeAccount();  //注销账户
             break;
         case 3:
             save();  //存款
@@ -102,7 +106,7 @@ void Bank::work()
 }
 
 
-void Bank::openAccount()
+void Bank::createAccount()
 //功能：开户
 
 {
@@ -125,8 +129,8 @@ void Bank::openAccount()
     cin>>nam;
     cout<<"身份证号:";
     cin>>ide;
-    cout<<"开户日期:";
-    cin>>y>>m>>d;
+    // cout<<"开户日期:";
+    // cin>>y>>m>>d;
     int iPass1, iPass2;
     cout<<"密码:";
     iPass1=inputPassword();  //输入密码
@@ -140,6 +144,15 @@ void Bank::openAccount()
         cout<<"存入金额:";
         cin>>bal;
         users=(User *)realloc(users,(N+2)*sizeof(User));  //增加一个对象的数组长度，以防止数据溢出
+
+        time_t t;// 获取当前的系统时间，返回的结果是一个time_t类型,一个整数，其值表示从时间1970年1月1日00:00:00到当前时刻的秒数
+        tm *lt;//获取日期和时间
+        t = time(NULL);
+        lt = localtime(&t);//获取秒数并转换为本地时间
+         y= lt->tm_year+1900;
+         m = lt->tm_mon+1;
+         d = lt->tm_mday;
+
         users[N].setUser(acc, nam, pw, bal,ide, sta,y,m,d);
         N++; //正式用户数增加1，确认了新用户已经加入
         cout<<"成功开户!"<<endl;
@@ -152,7 +165,7 @@ void Bank::openAccount()
 }
 
 
-void Bank::cancelAccount()
+void Bank::removeAccount()
 //功能：注销账户
 //找到账户并将其状态改为2-注销。
 {
@@ -269,6 +282,7 @@ void Bank::showAccount()
         {
             users[who].showBalance("余额");
             cout<<"状态:"<<sta[users[who].status]<<endl;
+            // cout<<"开户时间:"<<sta[users[who].year]<<sta[users[who].month]<<sta[users[who].day]<<endl;
         }
     }
     return;
@@ -442,7 +456,7 @@ void Bank::saveLog(int usernum,string infor)
     tm *lt;//获取日期和时间
     t = time(NULL);
     lt = localtime(&t);//获取秒数并转换为本地时间
-    ofstream workfile("accounts.log",ios::app);
+    ofstream workfile("accounts.log",ios::binary);
     if(!workfile)
     {
         cerr<<"open error!"<<endl;

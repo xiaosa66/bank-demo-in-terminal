@@ -19,6 +19,9 @@ void User::setUser(int acc,char nam[30], int pw, double bal,char ide[50] ,int st
     BASE::year=y;
     BASE::month=m;
     BASE::day=d;
+    // year=y;
+    // month=m;
+    // day=d;
 }
 
 

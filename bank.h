@@ -41,6 +41,9 @@ public:
 private:
     int account; //账号
     int password;  //密码
+    int year;  //开户时间
+    int month;  //开户时间
+    int day;  //开户时间
     char name[30];   //用户名
     double balance;  //账户余额
     int status;  //状态 0-正常  1-挂失  2-销户
@@ -55,8 +58,8 @@ public:
 	 Bank();  //开始前从文件中读数据，存在数组中
 	 ~Bank();   //程序结束前，将数组中的数据写入到文件中
     void work();  //业务
-    void openAccount(); //开户
-    void cancelAccount();  //注销账户
+    void createAccount(); //开户
+    void removeAccount();  //注销账户
     void save();   //存款
     void withdraw();   //取款
     void showAccount(); //查询余额
